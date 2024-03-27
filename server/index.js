@@ -22,13 +22,13 @@ app.get("/balance/:address", (req, res) => {
 });
 
 app.post("/send", async (req, res) => {
-  const { sender, recipient, amount, sig } = req.body;
+  const { sender, recipient, amount, sig } = await req.body;
   //console.log(sig)
   setInitialBalance(sender);
   setInitialBalance(recipient);
-  try{
-    const isVerified = await verifyTransfer(sender, recipient, amount, sig)
+  const isVerified = await verifyTransfer(sender, recipient, amount, sig)
     console.log(isVerified)
+  try{
     if (balances[sender] < amount) {
       res.status(400).send({ message: "Not enough funds!" });
     } else if(isVerified) {
