@@ -4,7 +4,7 @@ const cors = require("cors");
 const port = 3042;
 
 
-const {verifyTransfer} = require('./scripts/utils')
+const { deserializeSignature, verifyTransfer } = require('./scripts/utils')
 
 app.use(cors());
 app.use(express.json());
@@ -22,24 +22,25 @@ app.get("/balance/:address", (req, res) => {
 });
 
 app.post("/send", async (req, res) => {
-  const { sender, recipient, amount, sig } = await req.body;
-  //console.log(sig)
-  setInitialBalance(sender);
-  setInitialBalance(recipient);
-  try{
-    const isVerified = await verifyTransfer(sender, recipient, amount, sig)
+    const { sender, recipient, amount, sig } = await req.body;
+    //console.log(sig)
+    setInitialBalance(sender);
+    setInitialBalance(recipient);
+try{
+    const signature = await deserializeSignature(sig)
+    const isVerified = await verifyTransfer(sender, recipient, amount, signature)
     console.log(isVerified)
     if (balances[sender] < amount) {
       res.status(400).send({ message: "Not enough funds!" });
-    } else if(isVerified) {
+    } else if (isVerified) {
       balances[sender] -= amount;
       balances[recipient] += amount;
       res.send({ balance: balances[sender] });
     } else {
       res.status(403).send({ message: "address not verified!" });
     }
-  } catch(err){
-    res.status(500).send({message: err.message})
+  } catch (err) {
+    res.status(522).send({ message: err.message })
   }
 });
 
