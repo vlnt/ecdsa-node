@@ -5,14 +5,12 @@ import {toHex} from"ethereum-cryptography/utils"
 function Wallet({ privateKey, setPrivateKey, address, setAddress, balance, setBalance }) {
 
   async function onChange(evt) {
-    //console.log(evt.target.value)
     const privateKey = evt.target.value;
     setPrivateKey(privateKey)
     try{
       const address = toHex(secp256k1.getPublicKey(privateKey))
       setAddress(address);
       if (address) {
-        //setAddress(address);
         const {
           data: { balance },
         } = await server.get(`balance/${address}`);
@@ -25,9 +23,6 @@ function Wallet({ privateKey, setPrivateKey, address, setAddress, balance, setBa
       setAddress("")
       setBalance(0)
     }
-    
-    console.log(address)
-    
   }
 
   return (

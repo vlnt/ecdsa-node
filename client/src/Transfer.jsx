@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import server from "./server";
 import { secp256k1 } from "ethereum-cryptography/secp256k1.js";
 import { utf8ToBytes } from "ethereum-cryptography/utils";
@@ -7,11 +7,9 @@ import { keccak256 } from "ethereum-cryptography/keccak";
 function Transfer({ address, setBalance, privateKey }) {
   const [sendAmount, setSendAmount] = useState("");
   const [recipient, setRecipient] = useState("");
-  //const [sig, setSig] = useState({});
 
   const setValue = (setter) => (evt) => {
     setter(evt.target.value);
-    //console.log(evt.target.value)
   };
 
   function setSig(){
@@ -32,13 +30,6 @@ function Transfer({ address, setBalance, privateKey }) {
       let signature = await JSON.stringify(sig, (_, v) =>
         typeof v === "bigint" ? v.toString() : v
       );
-      const payload = {
-        sender: address,
-        amount: parseInt(sendAmount),
-        recipient,
-        sig: signature,
-      };
-      console.log(payload);
       const {
         data: { balance },
       } = await server.post(`send`, {
@@ -52,8 +43,6 @@ function Transfer({ address, setBalance, privateKey }) {
       alert(ex.response.data.message);
     }
   }
-
-  console.log(privateKey);
 
   return (
     <form className="container transfer" onSubmit={transfer}>
